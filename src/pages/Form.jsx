@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, BookOpen, Heart, Briefcase, Activity, ArrowLeft, ArrowRight, Check } from 'react-feather';
+import { User, BookOpen, Heart, Briefcase, Activity, ArrowLeft, ArrowRight, Check, AlertCircle, X } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import IntroModal from '../components/IntroModal';
-import { analyzeCareerChoices } from '../service/api/OrientationAi';
+import { analyzeCareerChoices, getErrorMessage } from '../service/api/OrientationAi';
 
 const Formulaire = () => {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ const Formulaire = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [showIntroModal, setShowIntroModal] = useState(true);
+  const [apiError, setApiError] = useState(null);
   const [formData, setFormData] = useState({
     // Informations personnelles
     nom: "",
@@ -192,10 +193,16 @@ const Formulaire = () => {
         navigate('/resultats');
       } catch (error) {
         console.error("Erreur lors de la soumission:", error);
-        alert(error.message || "Une erreur est survenue. Veuillez réessayer.");
+        // Récupérer le message d'erreur convivial
+        const errorInfo = getErrorMessage(error);
+        setApiError(errorInfo);
         setIsLoading(false);
       }
     }
+  };
+
+  const closeErrorModal = () => {
+    setApiError(null);
   };
 
   const handlePrevious = () => {
@@ -225,6 +232,62 @@ const Formulaire = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white">
       {showIntroModal && <IntroModal onStart={() => setShowIntroModal(false)} />}
+
+      {/* Modal d'erreur API */}
+      {apiError && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            {/* Header */}
+            <div className="bg-red-600 text-white p-6 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <AlertCircle className="w-6 h-6 mr-3" />
+                  <h2 className="text-xl font-bold">{apiError.title}</h2>
+                </div>
+                <button
+                  onClick={closeErrorModal}
+                  className="text-white hover:text-red-200 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              <p className="text-gray-700 leading-relaxed mb-6">
+                {apiError.message}
+              </p>
+
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Action recommandée :</span> {apiError.action}
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-50 px-6 py-4 rounded-b-xl flex gap-3">
+              <button
+                onClick={closeErrorModal}
+                className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Fermer
+              </button>
+              <button
+                onClick={() => {
+                  closeErrorModal();
+                  handleNext();
+                }}
+                className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors"
+              >
+                Réessayer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {!showIntroModal && (
         <>
           <Header />
