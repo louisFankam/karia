@@ -1,4 +1,8 @@
 # Karia
+<img width="1904" height="855" alt="image" src="https://github.com/user-attachments/assets/6abfe02a-374b-4ae8-9e17-71dadb2b231c" />
+<img width="1911" height="822" alt="image" src="https://github.com/user-attachments/assets/6a6426b8-b529-4295-b246-70b9c5d8f28d" />
+
+
 
 Plateforme d'orientation professionnelle intelligente pour les jeunes Africains, propulsée par l'intelligence artificielle.
 
