@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, BookOpen, Heart, Briefcase, Activity, ArrowLeft, ArrowRight, Check } from 'react-feather';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import IntroModal from '../components/IntroModal';
+import { analyzeCareerChoices } from '../service/api/OrientationAi';
 
 const Formulaire = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [showIntroModal, setShowIntroModal] = useState(true);
   const [formData, setFormData] = useState({
     // Informations personnelles
     nom: "",
@@ -106,13 +113,88 @@ const Formulaire = () => {
     });
   };
 
-  const handleNext = () => {
+  // Fonctions de validation pour chaque étape
+  const validateStep = (step) => {
+    const newErrors = {};
+
+    switch (step) {
+      case 0: // Informations personnelles
+        if (!formData.prenom.trim()) newErrors.prenom = "Le prénom est requis";
+        if (!formData.age || formData.age < 10 || formData.age > 100) {
+          newErrors.age = "Veuillez entrer un âge valide (entre 10 et 100 ans)";
+        }
+        if (!formData.sexe) newErrors.sexe = "Le sexe est requis";
+        if (!formData.pays.trim()) newErrors.pays = "Le pays est requis";
+        if (!formData.ville.trim()) newErrors.ville = "La ville est requise";
+        break;
+
+      case 1: // Parcours scolaire
+        if (!formData.niveau) newErrors.niveau = "Le niveau d'études est requis";
+        if (!formData.serie) newErrors.serie = "La série/filière est requise";
+        // Validation des notes (0-20)
+        Object.keys(formData.matieres).forEach(matiere => {
+          const note = formData.matieres[matiere];
+          if (note && (note < 0 || note > 20)) {
+            newErrors[`matieres.${matiere}`] = "La note doit être entre 0 et 20";
+          }
+        });
+        break;
+
+      case 2: // Centres d'intérêt
+        if (formData.interets.length === 0 && !formData.interetsLibre.trim()) {
+          newErrors.interets = "Veuillez sélectionner au moins un centre d'intérêt ou en décrire un";
+        }
+        break;
+
+      case 3: // Compétences
+        // Cette étape est optionnelle, pas de validation stricte
+        break;
+
+      case 4: // Aspirations
+        if (!formData.typeMetier) newErrors.typeMetier = "Le type de métier est requis";
+        if (!formData.styleVie) newErrors.styleVie = "Le style de vie est requis";
+        if (formData.preferencesTravail.length === 0) {
+          newErrors.preferencesTravail = "Veuillez sélectionner au moins une préférence de travail";
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = async () => {
+    // Valider l'étape actuelle avant d'avancer
+    if (!validateStep(currentStep)) {
+      // Si la validation échoue, scroller vers le premier champ en erreur
+      const firstError = document.querySelector('[data-error="true"]');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
+      setErrors({}); // Réinitialiser les erreurs
       window.scrollTo(0, 0);
     } else {
-      // Soumettre le formulaire
-      console.log("Formulaire soumis:", formData);
+      // Soumettre le formulaire et appeler l'API
+      setIsLoading(true);
+      try {
+        const result = await analyzeCareerChoices(formData);
+        // Stocker les résultats dans localStorage pour la page Result
+        localStorage.setItem('kariaResults', JSON.stringify(result));
+        // Rediriger vers la page de résultats
+        navigate('/resultats');
+      } catch (error) {
+        console.error("Erreur lors de la soumission:", error);
+        alert(error.message || "Une erreur est survenue. Veuillez réessayer.");
+        setIsLoading(false);
+      }
     }
   };
 
@@ -142,8 +224,11 @@ const Formulaire = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white">
-      <Header />
-      <div className="container mx-auto px-4 py-8">
+      {showIntroModal && <IntroModal onStart={() => setShowIntroModal(false)} />}
+      {!showIntroModal && (
+        <>
+          <Header />
+          <div className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-4 text-center">Découvre ton parcours idéal</h1>
@@ -187,15 +272,17 @@ const Formulaire = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label htmlFor="prenom" className="block text-sm font-medium text-gray-700">Prénom</label>
+                        <label htmlFor="prenom" className="block text-sm font-medium text-gray-700">Prénom *</label>
                         <input
                           id="prenom"
                           name="prenom"
                           value={formData.prenom}
                           onChange={handleInputChange}
                           placeholder="Ton prénom"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                          className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 ${errors.prenom ? 'border-red-500' : 'border-gray-300'}`}
+                          data-error={!!errors.prenom}
                         />
+                        {errors.prenom && <p className="text-sm text-red-600">{errors.prenom}</p>}
                       </div>
 
                       <div className="space-y-2">
@@ -213,7 +300,7 @@ const Formulaire = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label htmlFor="age" className="block text-sm font-medium text-gray-700">Âge</label>
+                        <label htmlFor="age" className="block text-sm font-medium text-gray-700">Âge *</label>
                         <input
                           id="age"
                           name="age"
@@ -221,12 +308,14 @@ const Formulaire = () => {
                           value={formData.age}
                           onChange={handleInputChange}
                           placeholder="Ton âge"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                          className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 ${errors.age ? 'border-red-500' : 'border-gray-300'}`}
+                          data-error={!!errors.age}
                         />
+                        {errors.age && <p className="text-sm text-red-600">{errors.age}</p>}
                       </div>
 
                       <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">Sexe</label>
+                        <label className="block text-sm font-medium text-gray-700">Sexe *</label>
                         <div className="flex gap-4">
                           <label className="inline-flex items-center">
                             <input
@@ -262,18 +351,20 @@ const Formulaire = () => {
                             <span className="ml-2">Autre</span>
                           </label>
                         </div>
+                        {errors.sexe && <p className="text-sm text-red-600">{errors.sexe}</p>}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label htmlFor="pays" className="block text-sm font-medium text-gray-700">Pays</label>
+                        <label htmlFor="pays" className="block text-sm font-medium text-gray-700">Pays *</label>
                         <select
                           id="pays"
                           name="pays"
                           value={formData.pays}
                           onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                          className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 ${errors.pays ? 'border-red-500' : 'border-gray-300'}`}
+                          data-error={!!errors.pays}
                         >
                           <option value="">Sélectionne ton pays</option>
                           <option value="senegal">Sénégal</option>
@@ -285,18 +376,21 @@ const Formulaire = () => {
                           <option value="maroc">Maroc</option>
                           <option value="autre">Autre</option>
                         </select>
+                        {errors.pays && <p className="text-sm text-red-600">{errors.pays}</p>}
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="ville" className="block text-sm font-medium text-gray-700">Ville</label>
+                        <label htmlFor="ville" className="block text-sm font-medium text-gray-700">Ville *</label>
                         <input
                           id="ville"
                           name="ville"
                           value={formData.ville}
                           onChange={handleInputChange}
                           placeholder="Ta ville"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                          className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 ${errors.ville ? 'border-red-500' : 'border-gray-300'}`}
+                          data-error={!!errors.ville}
                         />
+                        {errors.ville && <p className="text-sm text-red-600">{errors.ville}</p>}
                       </div>
                     </div>
                   </div>
@@ -698,9 +792,18 @@ const Formulaire = () => {
 
               <button
                 onClick={handleNext}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                disabled={isLoading}
+                className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm ${isLoading ? 'bg-orange-400 cursor-not-allowed' : 'text-white bg-orange-600 hover:bg-orange-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500`}
               >
-                {currentStep === steps.length - 1 ? (
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Analyse en cours...
+                  </>
+                ) : currentStep === steps.length - 1 ? (
                   <>
                     Voir mes résultats
                     <Check className="w-4 h-4 ml-2" />
@@ -717,6 +820,8 @@ const Formulaire = () => {
         </div>
       </div>
       <Footer />
+        </>
+      )}
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
 
 const Header = () => {
@@ -6,13 +7,15 @@ const Header = () => {
     <header className="bg-white shadow-md py-4 px-6">
       <div className="container mx-auto flex justify-between items-center">
         <div>
-          <img src={logo} alt="Karia Logo" className="h-12" />
+          <Link to="/">
+            <img src={logo} alt="Karia Logo" className="h-12" />
+          </Link>
         </div>
         <nav className="hidden md:flex space-x-8">
-          <a href="formulaire" className="text-gray-700 hover:text-orange-600 transition duration-300">Formulaire</a>
-          <a href="home" className="text-gray-700 hover:text-orange-600 transition duration-300">Accueil</a>
-          <a href="about" className="text-gray-700 hover:text-orange-600 transition duration-300">À propos</a>
-          <a href="contact" className="text-gray-700 hover:text-orange-600 transition duration-300">Contact</a>
+          <Link to="/formulaire" className="text-gray-700 hover:text-orange-600 transition duration-300">Formulaire</Link>
+          <Link to="/" className="text-gray-700 hover:text-orange-600 transition duration-300">Accueil</Link>
+          <Link to="/about" className="text-gray-700 hover:text-orange-600 transition duration-300">À propos</Link>
+          <Link to="/contact" className="text-gray-700 hover:text-orange-600 transition duration-300">Contact</Link>
         </nav>
         <div className="flex space-x-4">
           <button className="px-4 py-2 text-gray-700 hover:text-blue-600 transition duration-300">Se connecter</button>

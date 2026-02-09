@@ -1,12 +1,15 @@
 import axios from 'axios';
 
-// Configuration de base pour appeler l'API OpenAI
+// Configuration de base pour appeler l'API Z.ai (Claude)
+const API_KEY = import.meta.env.VITE_ZAI_API_KEY;
+const API_URL = import.meta.env.VITE_ZAI_API_URL || 'https://api.z.ai/api/anthropic';
+
 const apiClient = axios.create({
-  baseURL: 'https://api.openai.com/v1',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
-    // NOTE: En production, cette clé doit être gérée côté serveur!
-    'Authorization': `Bearer ${process.env.REACT_APP_OPENAI_KEY}`
+    'x-api-key': API_KEY,
+    'anthropic-version': '2023-06-01'
   }
 });
 // Fonction pour analyser les choix de carrière
@@ -89,15 +92,25 @@ Aucune explication, uniquement le JSON.
   `;
 
   try {
-    // Appel à l'API OpenAI
-    const response = await apiClient.post('/chat/completions', {
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7 // Contrôle la créativité (0=précis, 1=créatif)
+    // Appel à l'API Z.ai (Claude)
+    const response = await apiClient.post('/v1/messages', {
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: 4096,
+      system: "Tu es KariaBot, un expert en orientation pour les jeunes Africains. Tu réponds toujours au format JSON valide, sans aucune explication en dehors du JSON.",
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
     });
 
     // Extraction et validation de la réponse
-    const responseText = response.data.choices[0].message.content;
+    let responseText = response.data.content[0].text;
+
+    // Nettoyer les marqueurs de code markdown si présents
+    responseText = responseText.replace(/^```json\s*/, '').replace(/^```\s*/, '').replace(/\s*```$/, '');
+
     const result = JSON.parse(responseText);
 
     // Validation minimale de la structure
@@ -105,9 +118,12 @@ Aucune explication, uniquement le JSON.
       throw new Error("Format de réponse inattendu de l'IA");
     }
 
-    return result.metiers;
+    return result;
   } catch (error) {
     console.error("Erreur avec l'API d'orientation:", error);
+    if (error.response) {
+      console.error("Détail de l'erreur:", error.response.data);
+    }
     throw new Error("Désolé, je n'ai pas pu analyser tes réponses. Réessaie plus tard!");
   }
 };

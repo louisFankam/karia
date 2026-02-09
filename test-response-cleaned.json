@@ -1,0 +1,129 @@
+{
+  "metiers": [
+    {
+      "id": "fullstack_dev",
+      "titre": "Développeur Full Stack",
+      "description": "Conçoit et développe des applications web complètes (interface et serveur). C'est le cœur de l'activité souhaitée par Christophe, correspondant parfaitement à ses compétences techniques (React, Node.js) et son désir de créer des solutions utiles.",
+      "match": 98,
+      "competences": [
+        "HTML/CSS",
+        "JavaScript (React, Node.js)",
+        "Bases de données (SQL/NoSQL)",
+        "API REST",
+        "Git/Github",
+        "Méthodes Agiles"
+      ],
+      "salaire": "400 000 à 1 500 000 FCFA (Junior à Senior / Freelance international)",
+      "perspectives": "Excellente en Afrique. Digitalisation croissante des entreprises (banques, startups, administration). Forte demande pour des profils autonomes capables de gérer toute la chaîne de développement.",
+      "secteurs": [
+        "Services numériques / ESN",
+        "Fintech",
+        "E-santé",
+        "E-administration",
+        "Startups innovantes"
+      ]
+    },
+    {
+      "id": "product_manager",
+      "titre": "Chef de Produit Digital (Product Manager)",
+      "description": "Responsable de la vision et de la stratégie d'un produit numérique. Ce rôle permet de combiner la technique (compréhension du code) et l'innovation sociale, en pilotant les fonctionnalités pour répondre aux besoins des utilisateurs.",
+      "match": 85,
+      "competences": [
+        "Gestion de cycle de vie produit",
+        "UX/UI Design",
+        "Analyse de données",
+        "Communication technique",
+        "Priorisation",
+        "Gestion de projet (Agile/Scrum)"
+      ],
+      "salaire": "600 000 à 2 000 000+ FCFA",
+      "perspectives": "En forte émergence au Sénégal et en Afrique. Les startups tech ont besoin de profils capables de faire le lien entre les équipes techniques et les réalités du marché africain.",
+      "secteurs": [
+        "Startups technologiques",
+        "Fintech",
+        "Téléphonie mobile",
+        "Incubateurs"
+      ]
+    },
+    {
+      "id": "devops_engineer",
+      "titre": "Ingénieur DevOps & Cloud",
+      "description": "Automatise les processus de développement et de déploiement des applications. Idéal pour un profil technique aimant résoudre des problèmes complexes et optimiser les infrastructures pour des solutions à fort impact.",
+      "match": 80,
+      "competences": [
+        "Linux",
+        "Docker / Kubernetes",
+        "CI/CD",
+        "Cloud (AWS/Azure/Google Cloud)",
+        "Scripts (Bash/Python)",
+        "Surveillance système"
+      ],
+      "salaire": "700 000 à 1 800 000 FCFA",
+      "perspectives": "Très forte demande car les entreprises africaines migrent leurs infrastructures vers le Cloud pour plus de flexibilité et de sécurité. Compétences rares et très valorisées.",
+      "secteurs": [
+        "Infrastructures Cloud",
+        "Entreprises de services numériques",
+        "Banques et Assurances",
+        "Opérateurs télécoms"
+      ]
+    }
+  ],
+  "parcours": [
+    {
+      "id": "fullstack_dev",
+      "titre": "Parcours Développeur Full Stack",
+      "etapes": [
+        {
+          "titre": "Expertise Backend Avancée & Architecture",
+          "duree": "3-4 mois",
+          "description": "Approfondir Node.js, apprendre à gérer les bases de données NoSQL (MongoDB) et sécuriser les API REST.",
+          "ressources": [
+            { "nom": "The Net Ninja (Youtube)", "url": "https://www.youtube.com/@NetNinja" },
+            { "nom": "Udemy (Node.js Master Class)", "url": "https://www.udemy.com/topic/nodejs/" }
+          ],
+          "competences": ["Architecture Logicielle", "Sécurité API", "MongoDB", "Authentification (JWT)"]
+        },
+        {
+          "titre": "Maîtrise du Framework React (Frontend)",
+          "duree": "2 mois",
+          "description": "Passer du niveau débutant à avancé avec Redux, Next.js et les tests unitaires pour des applications performantes.",
+          "ressources": [
+            { "nom": "React Documentation", "url": "https://react.dev/" },
+            { "nom": "FreeCodeCamp", "url": "https://www.freecodecamp.org/" }
+          ],
+          "competences": ["Redux / Context API", "Next.js", "Tests (Jest)", "Optimisation SEO"]
+        },
+        {
+          "titre": "Projets Solidaires & Portfolio",
+          "duree": "3 mois",
+          "description": "Développer 2 applications concrètes pour le Sénégal (ex: app de santé ou d'éducation) et se former au travail d'équipe distant.",
+          "ressources": [
+            { "nom": "GitHub (Portfolio)", "url": "https://github.com/" },
+            { "nom": "DonnerGeCode (Communauté)", "url": "https://donnergecode.com/" }
+          ],
+          "competences": ["Gestion de projet Agile", "Déploiement Cloud", "Collaboration Git", "Créativité"]
+        }
+      ]
+    }
+  ],
+  "ressources": [
+    {
+      "categorie": "Communautés Tech Africaines",
+      "items": [
+        { "nom": "DonnerGeCode", "description": "Plateforme de mise en relation et offre d'emploi pour développeurs.", "url": "https://donnergecode.com/" },
+        { "nom": "JokkoSanté (Tech pour la santé)", "description": "Exemple d'innovation locale sénégalaise pour s'inspirer.", "url": "https://jokkosante.sn/" },
+        { "nom": "SunuTech", "description": "Communauté d'innovateurs et de développeurs au Sénégal.", "url": "https://sunutech.org/" },
+        { "nom": "Google Developer Groups (GDG) Dakar", "description": "Événements et ateliers pour développeurs à Dakar.", "url": "https://gdg.community.dev/gdg-dakar/" }
+      ]
+    },
+    {
+      "categorie": "Apprentissage (MOOCs & Plateformes)",
+      "items": [
+        { "nom": "OpenClassrooms", "description": "Cours gratuits en français pour approfondir les métiers du web.", "url": "https://openclassrooms.com/fr/" },
+        { "nom": "Udemy", "description": "Formation pratique payante mais souvent en promotion.", "url": "https://www.udemy.com/" },
+        { "nom": "FreeCodeCamp", "description": "Apprentissage du code gratuit et certifiant.", "url": "https://www.freecodecamp.org/" },
+        { "nom": "Alison", "description": "Cours en ligne gratuits sur divers sujets techniques.", "url": "https://alison.com/" }
+      ]
+    }
+  ]
+}
